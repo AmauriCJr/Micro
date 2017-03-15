@@ -45,5 +45,5 @@ Q5. Considere a variável inteira 'i', armazenando o valor 0x8051ABCD. Se 'i' é
 
 Q6. Sabendo que o processador do MSP430 tem registradores de 16 bits, como ele soma duas variáveis de 32 bits?
 
-  Ele divede as variáveis em dois registradores, somando primeiros os resgistradores com os números menos significativos, e depois os mais
-  significativos, somando também o carry caso exista.
+  Ele divede cada variável em dois registradores, utilizando quatro registradores no total, somando primeiros os resgistradores 
+  com os números menos significativos, e depois os mais significativos, somando também o carry caso exista.
