@@ -1,0 +1,49 @@
+Q1. Quais as diferenças entre os barramentos de dados e de endereços?
+
+  O barramento de dados transmite dados entre as unidades e deve possuir o mesmo número de bits que a memória para o processo não ficar lento.
+  O barramento de endereço transmite dados entre os registradores.
+
+Q2. Quais são as diferenças entre as memórias RAM e ROM?
+
+  Memória RAM é a memória volátil, ela guarda dados apenas temporariamente e se não receber energia os dados são perdidos.
+  Memória ROM guarda dados mesmo após desligada, e os dados são guardados até que sejam reescritos, a escrita na memórra RAM também é mais lenta.
+
+Q3. Considere o código abaixo, de 12 linhas:
+
+    1.   #include <stdio.h>
+    2.   int main(void)
+    3.   {
+    4.      int i;
+    5.      printf("Insira um número inteiro: ");
+    6.      scanf("%d", &i);
+    7.      if(i%2)
+    8.         printf("%d eh impar.\n");
+    9.      else
+   10.         printf("%d eh par.\n");
+   11.      return 0;
+   12.   }
+
+Para este código, responda:
+	(a) A variável 'i' é armazenada na memória RAM ou ROM? Por quê?
+  
+    For guardada na memória RAM pois o seu valor só permanece guardado enquanto o programa estiver rodadando e o computador ligado.
+   
+	(b) O programa compilado a partir deste código é armazenado na memória RAM ou ROM? Por quê?
+  
+    O programa é guardado na memória ROM. O computador pode ser desligado que o programa continuará salvo.
+
+Q4. Quais são as diferenças, vantagens e desvantagens das arquiteturas Harvard e Von Neumann?
+
+  A arquitetura Harvard permite a leitura simultânea de dados da RAM e da ROM, tornando-o mais rápido. A Von Neumann permite a leitura de apenas
+  um por vez, realizando suas funções mais lentamente.
+
+Q5. Considere a variável inteira 'i', armazenando o valor 0x8051ABCD. Se 'i' é armazenada na memória a partir do endereço 0x0200, como ficam este byte e os seguintes, considerando que a memória é:
+	(a) Little-endian?
+    0xCD, 0xBA, 0x15, 0x08
+	(b) Big-endian?
+    0x80, 0x51, 0xAB, 0xCD
+
+Q6. Sabendo que o processador do MSP430 tem registradores de 16 bits, como ele soma duas variáveis de 32 bits?
+
+  Ele divede as variáveis em dois registradores, somando primeiros os resgistradores com os números menos significativos, e depois os mais
+  significativos, somando também o carry caso exista.
