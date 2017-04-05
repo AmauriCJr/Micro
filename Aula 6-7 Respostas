@@ -13,6 +13,12 @@ O protótipo da função é:
 2. (a) Escreva uma função em C que calcule 'x' elevado à 'N'-ésima potência, seguindo o seguinte protótipo: 
 
 	int Potencia(int x, int N);
+	{
+		if(n<=1) return x;
+		x = x * x;
+		N--;
+		return Potencia(x, N);
+	}
 
 (b) Escreva a sub-rotina equivalente na linguagem Assembly do MSP430. 'x' e 'n' são fornecidos através dos registradores R15 e R14, respectivamente, e a saída deverá ser fornecida no registrador R15.
 
