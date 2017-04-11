@@ -3,6 +3,16 @@ Para cada questão, escreva funções em C e/ou sub-rotinas na linguagem Assembl
 1. (a) Escreva uma função em C que calcule a raiz quadrada 'x' de uma variável 'S' do tipo float, utilizando o seguinte algoritmo: após 'n+1' iterações, a raiz quadrada de 'S' é dada por
 
 	x(n+1) = (x(n) + S/x(n))/2
+	
+	float Raiz( float S, int n, float x)
+	{
+  	  x = S/2;
+   	 for(n=0;n<=10;n++)
+   	 {
+   	     x = (x + (S/x))/2;
+   	 }
+  	  return x;
+	}
 
 O protótipo da função é:
 
