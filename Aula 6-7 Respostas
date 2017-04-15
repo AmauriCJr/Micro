@@ -23,6 +23,54 @@ unsigned int Raiz_Quadrada(unsigned int S)
 
 (b) Escreva a sub-rotina equivalente na linguagem Assembly do MSP430. A variável 'S' é fornecida pelo registrador R15, e a raiz quadrada de 'S' (ou seja, a variável 'x') é fornecida pelo registrador R15 também.
 
+Raiz:
+clr.w R9
+Inicio:
+clr.w R12
+mov.w R15, R8
+mov.w #2, R14   ;R14 é o divisor
+call #Divisao
+Continua:
+mov.w R15, R8
+mov.w R10, R13  ;x = S/2
+mov.w R13, R14  ;Divisor = x
+call #Divisao
+add.w R13, R10  ;x + S/x
+mov.w #2, R14   ;Divisor = 2
+mov.w R10, R8
+call #Divisao
+jmp Loop
+
+
+Divisao:
+cmp #1, R14
+jeq Condicao1
+mov.w R14, R11
+sub.w R14, R8
+add.w #1, R12
+Comparar:
+dec.w R11
+cmp R11, R8
+jeq Resultado
+cmp #0, R11
+jeq Divisao
+jmp Comparar
+Condicao1
+mov.w R8, R12
+Resultado:
+mov.w R12, R10
+clr.w R14
+clr.w R12
+clr.w R11
+clr.w R8
+ret
+Loop:
+inc.w R9
+cmp #64, R9
+jne Continua
+mov.w R10, R15
+
+
 2. (a) Escreva uma função em C que calcule 'x' elevado à 'N'-ésima potência, seguindo o seguinte protótipo: 
 
 	int Potencia(int x, int N)
@@ -57,7 +105,6 @@ mov.w R15, R12
 jeq FIM
 clr.w R15
 jmp Multiplicacao
-ret
 COND:
 mov.w #1, R15
 FIM:
@@ -200,7 +247,7 @@ Considere o cálculo até o termo n = 20. O protótipo da função é double Exp
 
 double ExpTaylor (double x)
 {
-    // e = (x^i)/f
+    // e^x = (x^i)/f
     double e, t, s;
     double n, i, f;
     f = 1;
@@ -226,6 +273,127 @@ double ExpTaylor (double x)
 }
 
 (b) Escreva a sub-rotina equivalente na linguagem Assembly do MSP430, mas considere que os valores de entrada e de saída são inteiros de 16 bits. A variável de entrada é fornecida pelo registrador R15, e o valor de saída também.
+
+;x^n=R15^14
+;e^x = (x^i)/f
+
+mov.w #2, R15
+
+Exponencial:
+mov.w R15, R5   ;Entrada que n sera mudada
+clr.w R8        ;R8 = i
+mov.w R8, R6    ;R6 = i incrementador
+clr.w R12
+Inicio:
+mov.w R6, R8
+mov.w R8, R14
+call #Potencia
+clr.w R14
+mov.w R8, R13   ;R13 = Decrementador do fatorial
+call #Fatorial
+mov.w R8 , R14  ;R14 = Divisor
+mov.w R10, R8   ;R8 = Dividendo
+call #Divisao
+inc.w R6        ;incrementa i
+mov.w R10, R9   ;Variavel para realizar a soma dos termos
+clr.w R4
+add.w R9, R4    ;Resultado final
+cmp #20, R6
+jeq ACABOU
+jmp Inicio
+
+
+Divisao:
+cmp #1, R14
+jeq Condicao1
+mov.w R14, R11
+sub.w R14, R8
+add.w #1, R12
+Comparar:
+dec.w R11
+cmp R11, R8
+jeq Resultado
+cmp #0, R11
+jeq Divisao
+jmp Comparar
+Condicao1
+mov.w R8, R12
+Resultado:
+mov.w R12, R10  ;Resultado dado em R10
+clr.w R14
+clr.w R12
+clr.w R11
+clr.w R8
+ret
+
+
+
+Potencia:
+mov.w R5, R15
+cmp #1, R14
+jeq FIM
+cmp #0, R14
+jeq COND
+mov.w R15, R12
+mov.w R15, R11
+clr.w R15
+mov.w R12, R13
+Multiplicacao:
+add.w R12, R15
+cmp.w #1, R13
+dec.w R13
+jne Multiplicacao
+mov.w R11, R13
+dec.w R14
+cmp #1, R14
+mov.w R15, R12
+jeq FIM
+clr.w R15
+jmp Multiplicacao
+COND:
+mov.w #1, R15
+FIM:
+mov.w  R15, R10 ;R10 = Resposta
+clr.w R12
+clr.w R11
+clr.w R13
+clr.w R14
+ret
+; Ta bugando aki no fatorial a partir do clock 114 o erro começa
+Fatorial:
+mov.w R6, R7    ;Manda o valor q não pode ser mudado para uma variavel
+cmp #0, R6
+jeq Cond2
+cmp #0, R8
+jeq RES
+Degraus:
+mov.w #0, R12   ;Controlador do loop
+dec.w R13
+mov.w R13, R11
+cmp R12, R13
+jne Soma
+RES:
+mov.w R14, R8   ;Limpa tudo e resultado é dado no R8
+clr.w R11
+clr.w R12
+clr.w R13
+clr.w R14
+clr.w R7
+ret
+Soma:
+add.w R7, R14
+dec.w R11
+cmp #0, R11
+jne Soma
+mov.w R14, R7
+jmp Degraus
+Cond2:
+mov.w #1, R14
+jmp RES
+
+ACABOU:
+mov.w R4, R15
+
 
 8. Escreva uma sub-rotina na linguagem Assembly do MSP430 que indica se um vetor esta ordenado de forma decrescente. Por exemplo:
 [5 4 3 2 1] e [90 23 20 10] estão ordenados de forma decrescente.
