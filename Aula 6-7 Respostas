@@ -415,6 +415,23 @@ mov.w R4, R15
 [1 2 3 4 5] e [1 2 3 2] não estão.
 O primeiro endereço do vetor é fornecido pelo registrador R15, e o tamanho do vetor é fornecido pelo registrador R14. A saída deverá ser fornecida no registrador R15, valendo 1 quando o vetor estiver ordenado de forma decrescente, e valendo 0 em caso contrário.
 
+Decrescente:
+dec.w R14
+rla R15
+cmp 1(R15), 0(R15)
+jl Crescente
+cmp #1, R14
+jeq Decre
+jne Decrescente
+Crescente:
+mov.w #0, R15
+jmp FIM
+Decre:
+mov.w #1, R15
+jmp FIM
+FIM:
+
+
 9. Escreva uma sub-rotina na linguagem Assembly do MSP430 que calcula o produto escalar de dois vetores, 'a' e 'b':
 	
 O primeiro endereço do vetor 'a' deverá ser passado através do registrador R15, o primeiro endereço do vetor 'b' deverá ser passado através do registrador R14, e o tamanho do vetor deverá ser passado pelo registrador R13. A saída deverá ser fornecida no registrador R15.
