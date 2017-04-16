@@ -274,16 +274,14 @@ double ExpTaylor (double x)
 
 (b) Escreva a sub-rotina equivalente na linguagem Assembly do MSP430, mas considere que os valores de entrada e de saída são inteiros de 16 bits. A variável de entrada é fornecida pelo registrador R15, e o valor de saída também.
 
-;x^n=R15^14
-;e^x = (x^i)/f
-
-mov.w #2, R15
+;O programa não da conta de fazer mais do que 7 iterações, impossibilitando um resultado preciso.
 
 Exponencial:
 mov.w R15, R5   ;Entrada que n sera mudada
 clr.w R8        ;R8 = i
 mov.w R8, R6    ;R6 = i incrementador
 clr.w R12
+clr.w R4
 Inicio:
 mov.w R6, R8
 mov.w R8, R14
@@ -292,18 +290,19 @@ clr.w R14
 mov.w R8, R13   ;R13 = Decrementador do fatorial
 call #Fatorial
 mov.w R8 , R14  ;R14 = Divisor
-mov.w R10, R8   ;R8 = Dividendo
+mov.w R11, R8   ;R8 = Dividendo
 call #Divisao
 inc.w R6        ;incrementa i
 mov.w R10, R9   ;Variavel para realizar a soma dos termos
-clr.w R4
 add.w R9, R4    ;Resultado final
-cmp #20, R6
+cmp #7, R6
 jeq ACABOU
 jmp Inicio
 
 
 Divisao:
+cmp R14, R8
+jl Condi1
 cmp #1, R14
 jeq Condicao1
 mov.w R14, R11
@@ -316,8 +315,12 @@ jeq Resultado
 cmp #0, R11
 jeq Divisao
 jmp Comparar
-Condicao1
+Condicao1:
 mov.w R8, R12
+jmp Resultado
+Condi1:
+mov.w #0, R12
+jmp Resultado
 Resultado:
 mov.w R12, R10  ;Resultado dado em R10
 clr.w R14
@@ -353,43 +356,55 @@ jmp Multiplicacao
 COND:
 mov.w #1, R15
 FIM:
-mov.w  R15, R10 ;R10 = Resposta
+mov.w  R15, R11 ;R10 = Resposta
 clr.w R12
-clr.w R11
 clr.w R13
 clr.w R14
 ret
-; Ta bugando aki no fatorial a partir do clock 114 o erro começa
+
 Fatorial:
-mov.w R6, R7    ;Manda o valor q não pode ser mudado para uma variavel
-cmp #0, R6
+mov.w R6, R7
+clr.w R10       ;soma
+clr.w R12       ;controlador do loop de somas
+clr.w R14       ;serve pra atribuir o valor da soma passada ao novo somador
+cmp #0, R7
+jeq Cond1
+cmp #1, R7
+jeq Cond1
+cmp #2, R7
 jeq Cond2
-cmp #0, R8
-jeq RES
-Degraus:
-mov.w #0, R12   ;Controlador do loop
+mov.w R7, R13   ; controlador do numero de somas
+Loop1:
 dec.w R13
-mov.w R13, R11
-cmp R12, R13
-jne Soma
-RES:
-mov.w R14, R8   ;Limpa tudo e resultado é dado no R8
-clr.w R11
-clr.w R12
-clr.w R13
-clr.w R14
-clr.w R7
-ret
-Soma:
-add.w R7, R14
-dec.w R11
-cmp #0, R11
-jne Soma
-mov.w R14, R7
-jmp Degraus
+cmp #1, R13
+jeq FM
+cmp #0, R14
+jne Igualador
+Soma1:
+add.w R7, R10
+Loop2:
+inc.w R12
+cmp.w R12, R13
+jeq Loop1
+inc.w R14
+jne Soma1
+Cond1:
+mov.w #1, R10
+jmp FM
 Cond2:
-mov.w #1, R14
-jmp RES
+mov.w #2, R10
+jmp FM
+Igualador:
+mov.w R10, R7
+mov.w #1, R12
+jmp Soma1
+FM:
+mov.w R10, R8
+clr.w R13
+clr.w R12
+clr.w R14
+clr.w R10
+ret
 
 ACABOU:
 mov.w R4, R15
