@@ -1,8 +1,188 @@
 1. Escreva uma função em C que faz o debounce de botões ligados à porta P1.
 
+#include <msp430g2553.h>
+
+#define LED1 BIT0
+#define LED2 BIT6
+
+
+void debounce()
+{
+  volatile unsigned int x;
+  x = 20; // tempo do debounce 20 mseg
+  TACCR0 = 1000-1;
+  TACTL |= TACLR;
+  TACTL = TASSEL_2 + ID_0 + MC_1;
+  while(x>0)
+  {
+    x--;
+    while((TACTL & TAIFG) == 0);
+    TACTL &=~TAIFG;
+  }
+  TACTL = MC_0;
+}
+
+
+void main(void)
+{
+    volatile int i;
+    WDTCTL = WDTPW + WDTHOLD;
+    P1DIR = LED1 + LED2;
+    P1OUT |= BIT3;
+    P1REN |= BIT3;
+    
+    while (1)
+    {
+
+        if (BIT3 & P1IN)
+        {
+            P1OUT = ~0x41;
+
+        }else
+        {
+            debounce();
+            P1OUT |= 0x41;
+        }
+    }
+}
+
 2. Escreva um código em C que lê 9 botões multiplexados por 6 pinos, e pisca os LEDs da placa Launchpad de acordo com os botões. Por exemplo, se o primeiro botão é pressionado, os LEDs piscam uma vez; se o segundo botão é pressionado, os LEDs piscam duas vezes; e assim por diante. Se mais de um botão é pressionado, os LEDs não piscam.
 
+#include <msp430g2553.h>
 
+#define E1 BIT1
+#define E2 BIT2
+#define E3 BIT3
+#define S1 BIT4
+#define S2 BIT5
+#define S3 BIT7
+#define LED1 BIT0
+#define LED2 BIT6
+
+void alternador(unsigned volatile int x)
+{
+  if(x == 0)
+  {
+    P1OUT &= ~S1;
+    P1OUT |= (S2 + S3);
+  }
+  if(x == 1)
+  {
+    P1OUT &= ~S2;
+    P1OUT |= (S1 + S3);
+  }
+  if(x == 2)
+  {
+    P1OUT &= ~S3;
+    P1OUT |= (S1 + S2);
+  }
+}
+
+
+
+void atraso(volatile unsigned int x)
+{
+  TACCR0 = 1000-1;
+  TACTL |= TACLR;
+  TACTL = TASSEL_2 + ID_0 + MC_1;
+  while(x>0)
+  {
+    x--;
+    while((TACTL & TAIFG) == 0);
+    TACTL &=~TAIFG;
+  }
+  TACTL = MC_0;
+}
+
+void main(void)
+{
+    volatile int x, c, t;
+    WDTCTL = WDTPW + WDTHOLD;
+    P1DIR = E1 + E2 + E3 + S1 + S2 + S3;
+    P1DIR = LED1 + LED2;
+    P1OUT = S1 + S2 + S3;
+    P1REN = E1 + E2 + E3;
+    x = 0;
+    c = 1;
+    while(1)
+    {
+      alternador(x);
+      if((E1 & P1IN) == 0 && x == 0)
+      {
+        P1OUT ^= BIT6 + BIT0;
+        atraso(c);
+      }
+      if((E1 & P1IN) == 0 && x == 1)
+      {
+        for(t=0;t<=1;t++)
+        {
+          P1OUT ^= BIT6 + BIT0;
+          atraso(c);
+        }
+      }
+      if((E1 & P1IN) == 0 && x == 2)
+      {
+        for(t=0;t<=2;t++)
+        {
+          P1OUT ^= BIT6 + BIT0;
+          atraso(c);
+        }
+      }
+      if((E2 & P1IN) == 0 && x == 0)
+      {
+        for(t=0;t<=3;t++)
+        {
+          P1OUT ^= BIT6 + BIT0;
+          atraso(c);
+        }
+      }
+      if((E2 & P1IN) == 0 && x == 1)
+      {
+        for(t=0;t<=4;t++)
+        {
+          P1OUT ^= BIT6 + BIT0;
+          atraso(c);
+        }
+      }
+      if((E2 & P1IN) == 0 && x == 2)
+      {
+        for(t=0;t<=5;t++)
+        {
+          P1OUT ^= BIT6 + BIT0;
+          atraso(c);
+        }
+      }
+      if((E3 & P1IN) == 0 && x == 0)
+      {
+        for(t=0;t<=6;t++)
+        {
+          P1OUT ^= BIT6 + BIT0;
+          atraso(c);
+        }
+      }
+      if((E3 & P1IN) == 0 && x == 1)
+      {
+        for(t=0;t<=7;t++)
+        {
+          P1OUT ^= BIT6 + BIT0;
+          atraso(c);
+        }
+      }
+      if((E3 & P1IN) == 0 && x == 2)
+      {
+        for(t=0;t<=8;t++)
+        {
+          P1OUT ^= BIT6 + BIT0;
+          atraso(c);
+        }
+      }
+       x++;
+       if(x >= 3)
+       {
+	  x = 0;
+       }
+    }
+ }
 
 
 
