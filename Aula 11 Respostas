@@ -390,20 +390,41 @@ void main(void)
   }
 9. Defina a função void ConfigPWM(volatile unsigned int freqs, volatile unsigned char ciclo_de_trabalho); para configurar e ligar o Timer_A em modo de comparação. Considere que o pino P1.6 já foi anteriormente configurado como saída do canal 1 de comparação do Timer_A, que somente os valores {100, 200, 300, …, 1000} Hz são válidos para a frequência, que somente os valores {0, 25, 50, 75, 100} % são válidos para o ciclo de trabalho, e que o sinal de clock SMCLK do MSP430 está operando a 1 MHz.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+void ConfigPWM(volatile unsigned int freqs,volatile unsigned char ciclo_de_trabalho)
+{
+  volatile unsigned int x, y;
+  x = 1000/freqs;
+  y = x/4;
+  if(ciclo_de_trabalho == '0')
+  {
+    P1OUT = 0;
+  }
+  if(ciclo_de_trabalho == '25')
+  {
+    P1OUT = BIT6;
+    atraso(y);
+    P1OUT = 0;
+    atraso(3*y);
+  }
+  if(ciclo_de_trabalho == '50')
+  {
+    P1OUT = BIT6;
+    atraso(2*y);
+    P1OUT = 0;
+    atraso(2*y);
+  }
+  if(ciclo_de_trabalho == '75')
+  {
+    P1OUT = BIT6;
+    atraso(3*y);
+    P1OUT = 0;
+    atraso(y);
+  }
+  if(ciclo_de_trabalho == '100')
+  {
+    P1OUT = BIT6;
+  }
+}
 
 
 
