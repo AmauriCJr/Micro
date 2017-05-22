@@ -1,14 +1,173 @@
 1. Defina a função void Atraso(volatile unsigned int x); que fornece um atraso de 'x' milissegundos. Utilize o Timer_A para a contagem de tempo, e assuma que o SMCLK já foi configurado para funcionar a 1 MHz. Esta função poderá ser utilizada diretamente nas outras questões desta prova.
 
+void atraso(volatile unsigned int x)
+{
+  TACCR0 = 1000-1;
+  TACTL |= TACLR;
+  TACTL = TASSEL_2 + ID_0 + MC_1;
+  while(x>0)
+  {
+    x--;
+    while((TACTL & TAIFG) == 0);
+    TACTL &=~TAIFG;
+  }
+  TACTL = MC_0;
+}
+
 2. Pisque os LEDs da Launchpad numa frequência de 100 Hz.
+
+#include<msp430g2553.h>
+
+void atraso(volatile unsigned int x)
+{
+  TACCR0 = 1000-1;
+  TACTL |= TACLR;
+  TACTL = TASSEL_2 + ID_0 + MC_1;
+  while(x>0)
+  {
+    x--;
+    while((TACTL & TAIFG) == 0);
+    TACTL &=~TAIFG;
+  }
+  TACTL = MC_0;
+}
+
+void main(void)
+  {
+    volatile int i, x;
+    WDTCTL = WDTPW + WDTHOLD;
+    P1DIR = BIT6 + BIT0;
+    P1OUT = BIT6 + BIT0;
+    x = 10;    //100 Hz ou 10 milisegundos de delay entre uma piscada e outra
+    while(1)
+    {
+        P1OUT ^= BIT6 + BIT0;
+        atraso(x);
+    }
+  }
+
 
 3. Pisque os LEDs da Launchpad numa frequência de 20 Hz.
 
+#include<msp430g2553.h>
+
+void atraso(volatile unsigned int x)
+{
+  TACCR0 = 1000-1;
+  TACTL |= TACLR;
+  TACTL = TASSEL_2 + ID_0 + MC_1;
+  while(x>0)
+  {
+    x--;
+    while((TACTL & TAIFG) == 0);
+    TACTL &=~TAIFG;
+  }
+  TACTL = MC_0;
+}
+
+void main(void)
+  {
+    volatile int i, x;
+    WDTCTL = WDTPW + WDTHOLD;
+    P1DIR = BIT6 + BIT0;
+    P1OUT = BIT6 + BIT0;
+    x = 50;    //20 Hz ou 50 milisegundos de delay entre uma piscada e outra
+    while(1)
+    {
+        P1OUT ^= BIT6 + BIT0;
+        atraso(x);
+    }
+  }
+
 4. Pisque os LEDs da Launchpad numa frequência de 1 Hz.
+
+#include<msp430g2553.h>
+
+void atraso(volatile unsigned int x)
+{
+  TACCR0 = 1000-1;
+  TACTL |= TACLR;
+  TACTL = TASSEL_2 + ID_0 + MC_1;
+  while(x>0)
+  {
+    x--;
+    while((TACTL & TAIFG) == 0);
+    TACTL &=~TAIFG;
+  }
+  TACTL = MC_0;
+}
+
+void main(void)
+  {
+    volatile int i, x;
+    WDTCTL = WDTPW + WDTHOLD;
+    P1DIR = BIT6 + BIT0;
+    P1OUT = BIT6 + BIT0;
+    x = 1000;    //1 Hz ou 1000 milisegundos de delay entre uma piscada e outra
+    while(1)
+    {
+        P1OUT ^= BIT6 + BIT0;
+        atraso(x);
+    }
+  }
 
 5. Pisque os LEDs da Launchpad numa frequência de 0,5 Hz.
 
+#include<msp430g2553.h>
+
+void atraso(volatile unsigned int x)
+{
+  TACCR0 = 1000-1;
+  TACTL |= TACLR;
+  TACTL = TASSEL_2 + ID_0 + MC_1;
+  while(x>0)
+  {
+    x--;
+    while((TACTL & TAIFG) == 0);
+    TACTL &=~TAIFG;
+  }
+  TACTL = MC_0;
+}
+
+void main(void)
+  {
+    volatile int i, x;
+    WDTCTL = WDTPW + WDTHOLD;
+    P1DIR = BIT6 + BIT0;
+    P1OUT = BIT6 + BIT0;
+    x = 2000;    //0,5 Hz ou 2000 milisegundos de delay entre uma piscada e outra
+    while(1)
+    {
+        P1OUT ^= BIT6 + BIT0;
+        atraso(x);
+    }
+  }
+
 6. Repita as questões 2 a 5 usando a interrupção do Timer A para acender ou apagar os LEDs.
+
+  4-
+  #include "msp430g2231.h" 
+
+
+void main()
+{
+  WDTCTL = WDTPW + WDTHOLD;
+  CCTL0 = CCIE; 
+  TACTL = TASSEL_2 + MC_1 + ID_3;
+  CCR0 =  125000;
+  P1OUT &= 0x00;
+  P1DIR &= 0x00;
+  P1DIR |= BIT0 + BIT6;
+  _BIS_SR(CPUOFF + GIE); 
+  while(1)
+  {}
+}
+
+#pragma vector=TIMERA0_VECTOR
+__interrupt void Timer_A (void)
+{
+   P1OUT ^= BIT0 + BIT6;
+}
 
 7. Defina a função void paralelo_para_serial(void); que lê o byte de entrada via porta P1 e transmite os bits serialmente via pino P2.0. Comece com um bit em nivel alto, depois os bits na ordem P1.0 - P1.1 - … - P1.7 e termine com um bit em nível baixo. Considere um período de 1 ms entre os bits.
 
